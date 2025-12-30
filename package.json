@@ -2,7 +2,7 @@
   "name": "docudepth-vscode",
   "displayName": "DocuDepth AI",
   "description": "AI-powered context maps for your codebase - Make AI coding assistants dramatically more accurate",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "docudepthai",
   "icon": "icon.png",
   "repository": {
