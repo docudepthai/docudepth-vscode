@@ -11,7 +11,7 @@ export const COGNITO_CONFIG = {
  * API configuration
  */
 export const API_CONFIG = {
-  defaultEndpoint: 'https://yi4c537i4h.execute-api.us-east-2.amazonaws.com/prod',
+  defaultEndpoint: 'https://9grz9fdho6.execute-api.us-east-2.amazonaws.com/prod',
 };
 
 /**
