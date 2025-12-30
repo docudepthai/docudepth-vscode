@@ -126,19 +126,35 @@ Once generation is complete:
 
 ## Using Context Maps with AI Assistants
 
-### Copying the Context Prompt
+### Automatic AI Integration (Recommended)
+
+DocuDepth **automatically generates context files** that your AI tools read natively. No copy/paste required!
+
+When you generate a context map, DocuDepth creates these files in your project:
+
+| AI Tool | Generated File | What Happens |
+|---------|----------------|--------------|
+| **Claude Code** | `CLAUDE.md` | Claude reads it automatically |
+| **Cursor** | `.cursorrules` | Cursor reads it automatically |
+| **Windsurf** | `.windsurfrules` | Windsurf reads it automatically |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Copilot reads it automatically |
+| **Continue.dev** | `.continuerules` | Continue reads it automatically |
+| **Aider** | `.aider/context.md` | Aider reads it automatically |
+
+**Just run "Initialize Context Map" once, and every AI tool gets context automatically.**
+
+These files are:
+- Auto-generated when you initialize/refresh your context map
+- Auto-updated when your code changes (with auto-sync enabled)
+- Auto-added to `.gitignore` so they don't clutter your repo
+
+### Manual Copy (For Other Tools)
+
+For AI tools without native file support (ChatGPT web, Claude.ai, etc.):
 
 1. Open the Command Palette
 2. Type "DocuDepth: Copy Context Prompt"
-3. The context is now in your clipboard
-
-### Using with Different AI Assistants
-
-#### Claude (claude.ai or API)
-
-1. Copy the context prompt
-2. Paste it at the beginning of your conversation
-3. Then ask your coding questions
+3. Paste it at the beginning of your AI conversation
 
 **Example:**
 ```
@@ -147,31 +163,12 @@ Once generation is complete:
 Now, can you help me add a new API endpoint for user preferences?
 ```
 
-#### ChatGPT
-
-1. Copy the context prompt
-2. Start a new conversation
-3. Paste the context as your first message
-4. Follow up with your questions
-
-#### Cursor IDE
-
-1. Copy the context prompt
-2. Use `Cmd+L` to open the AI chat
-3. Paste the context before your question
-
-#### GitHub Copilot Chat
-
-1. Copy the context prompt
-2. Open Copilot Chat in VS Code
-3. Paste the context and ask your questions
-
 ### Tips for Best Results
 
-- **Be specific**: After providing context, ask focused questions
-- **Reference the context**: "Based on the architecture described above..."
-- **Iterate**: Use follow-up questions for complex tasks
-- **Update regularly**: Refresh your context map when making significant changes
+- **Just code**: With automatic integration, your AI assistant already has context
+- **Be specific**: Ask focused questions about your codebase
+- **Trust the context**: AI will reference your architecture, patterns, and conventions
+- **Keep auto-sync on**: Context stays current as you make changes
 
 ---
 
@@ -426,12 +423,22 @@ When reporting issues, please include:
 
 ## Changelog
 
+### Version 1.2.0
+- **Automatic AI tool integration** - Generates context files for Claude, Cursor, Copilot, Windsurf, Continue, and Aider
+- Context files auto-update when code changes
+- All generated files added to .gitignore automatically
+- Browser-based OAuth login
+
+### Version 1.1.0
+- Browser-based authentication (removed SDK dependency)
+- Extension size reduced from 428KB to 46KB
+- Improved error handling
+
 ### Version 1.0.0
 - Initial release
 - Context map generation
 - Auto-sync feature
 - Copy context prompt functionality
-- Cognito authentication integration
 
 ---
 

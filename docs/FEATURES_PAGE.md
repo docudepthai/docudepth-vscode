@@ -70,24 +70,32 @@ Your context map automatically updates as you code. No manual refresh needed.
 
 ---
 
-### 3. One-Click Copy to AI
+### 3. Zero-Config AI Integration
 
-**Seamless AI assistant integration**
+**Your AI tools get context automatically**
 
-Copy your context prompt with a single command and paste it into any AI assistant.
+DocuDepth generates native context files that AI tools read automatically. No copy/paste needed.
 
-**Works with:**
-- Claude (claude.ai)
-- ChatGPT
-- Cursor IDE
-- GitHub Copilot
-- Windsurf
+**Automatic Integration:**
+| AI Tool | Generated File |
+|---------|----------------|
+| Claude Code | `CLAUDE.md` |
+| Cursor | `.cursorrules` |
+| Windsurf | `.windsurfrules` |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+| Continue.dev | `.continuerules` |
+| Aider | `.aider/context.md` |
+
+**Also works with (manual copy):**
+- ChatGPT (web)
+- Claude.ai
 - Any AI that accepts text input
 
 **Benefits:**
-- No complex setup or integrations
-- Works with any AI tool
-- Instant context transfer
+- Zero configuration required
+- Just generate once - all tools get context
+- Files auto-update when code changes
+- Auto-added to .gitignore
 
 ---
 
