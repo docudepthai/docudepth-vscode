@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+
+# Package files
+*.vsix
+
+# IDE
+.vscode-test/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Claude
+.claude/

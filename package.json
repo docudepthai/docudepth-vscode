@@ -1,0 +1,148 @@
+{
+  "name": "docudepth-vscode",
+  "displayName": "DocuDepth AI",
+  "description": "AI-powered context maps for your codebase - Make AI coding assistants dramatically more accurate",
+  "version": "1.1.0",
+  "publisher": "docudepthai",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docudepthai/docudepth-vscode"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "documentation",
+    "ai",
+    "context",
+    "claude",
+    "cursor",
+    "chatgpt",
+    "copilot"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:docudepth.login",
+    "onCommand:docudepth.logout",
+    "onCommand:docudepth.initialize",
+    "onCommand:docudepth.refresh",
+    "onCommand:docudepth.copyContextPrompt",
+    "onCommand:docudepth.openContextMap",
+    "onCommand:docudepth.showProgress"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "docudepth.login",
+        "title": "DocuDepth: Login",
+        "icon": "$(key)"
+      },
+      {
+        "command": "docudepth.logout",
+        "title": "DocuDepth: Logout",
+        "icon": "$(sign-out)"
+      },
+      {
+        "command": "docudepth.initialize",
+        "title": "DocuDepth: Initialize Context Map",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "docudepth.refresh",
+        "title": "DocuDepth: Refresh Context Map",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "docudepth.copyContextPrompt",
+        "title": "DocuDepth: Copy Context Prompt",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "docudepth.openContextMap",
+        "title": "DocuDepth: Open Context Map",
+        "icon": "$(file-symlink-file)"
+      },
+      {
+        "command": "docudepth.showProgress",
+        "title": "DocuDepth: Show Generation Progress"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "docudepth.login",
+          "when": "!docudepth.isAuthenticated"
+        },
+        {
+          "command": "docudepth.logout",
+          "when": "docudepth.isAuthenticated"
+        },
+        {
+          "command": "docudepth.initialize",
+          "when": "docudepth.isAuthenticated"
+        },
+        {
+          "command": "docudepth.refresh",
+          "when": "docudepth.hasContextMap"
+        },
+        {
+          "command": "docudepth.copyContextPrompt",
+          "when": "docudepth.hasContextMap"
+        },
+        {
+          "command": "docudepth.openContextMap",
+          "when": "docudepth.hasContextMap"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "DocuDepth AI",
+      "properties": {
+        "docudepth.apiEndpoint": {
+          "type": "string",
+          "default": "https://yi4c537i4h.execute-api.us-east-2.amazonaws.com/prod",
+          "description": "DocuDepth API endpoint"
+        },
+        "docudepth.autoSync": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically sync file changes to update context map"
+        },
+        "docudepth.autoSyncDebounce": {
+          "type": "number",
+          "default": 3000,
+          "description": "Debounce time (ms) before auto-syncing changes"
+        },
+        "docudepth.maxFilesPerBatch": {
+          "type": "number",
+          "default": 50,
+          "description": "Maximum number of files to include in a single update batch"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/vsce": "^2.22.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  }
+}
