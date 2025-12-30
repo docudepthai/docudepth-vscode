@@ -95,7 +95,7 @@ export class TokenManager {
 
     try {
       const config = vscode.workspace.getConfiguration('docudepth');
-      const apiEndpoint = config.get<string>('apiEndpoint') || 'https://yi4c537i4h.execute-api.us-east-2.amazonaws.com/prod';
+      const apiEndpoint = config.get<string>('apiEndpoint') || 'https://9grz9fdho6.execute-api.us-east-2.amazonaws.com/prod';
 
       const response = await fetch(`${apiEndpoint}/api/auth/refresh`, {
         method: 'POST',

@@ -106,7 +106,7 @@
       "properties": {
         "docudepth.apiEndpoint": {
           "type": "string",
-          "default": "https://yi4c537i4h.execute-api.us-east-2.amazonaws.com/prod",
+          "default": "https://9grz9fdho6.execute-api.us-east-2.amazonaws.com/prod",
           "description": "DocuDepth API endpoint"
         },
         "docudepth.autoSync": {
