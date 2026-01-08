@@ -2,7 +2,7 @@
   "name": "docudepth-vscode",
   "displayName": "DocuDepth AI",
   "description": "AI-powered context maps for your codebase - Make AI coding assistants dramatically more accurate",
-  "version": "1.2.1",
+  "version": "1.3.1",
   "publisher": "docudepthai",
   "icon": "icon.png",
   "repository": {
@@ -112,12 +112,17 @@
         "docudepth.autoSync": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically sync file changes to update context map"
+          "description": "Automatically sync on file save (Cmd+S / Ctrl+S)"
         },
         "docudepth.autoSyncDebounce": {
           "type": "number",
           "default": 3000,
-          "description": "Debounce time (ms) before auto-syncing changes"
+          "description": "Debounce time (ms) after save before syncing. Batches rapid 'Save All' operations."
+        },
+        "docudepth.syncOnFocusLoss": {
+          "type": "boolean",
+          "default": true,
+          "description": "Sync pending changes when VS Code loses focus"
         },
         "docudepth.maxFilesPerBatch": {
           "type": "number",

@@ -10,7 +10,7 @@ export interface ContextMap {
     primaryLanguage: string;
     framework?: string;
     totalFiles: number;
-    totalTokens: number;
+    totalTokens?: number;
   };
   architecture: {
     style: string;
@@ -21,11 +21,18 @@ export interface ContextMap {
   files: Record<string, FileInfo>;
   symbols: Record<string, Symbol>;
   dependencies: {
-    edges: DependencyEdge[];
-    circularDependencies: string[][];
-    externalPackages: ExternalPackage[];
+    edges?: DependencyEdge[];
+    circularDependencies?: string[][];
+    externalPackages?: ExternalPackage[];
+    internal?: InternalDependency[];
+    external?: ExternalDependency[];
   };
   patterns: Pattern[];
+  // Extended fields for better AI context
+  api?: ApiInfo;
+  aiGuidance?: AIGuidance;
+  semanticSearch?: SemanticSearch;
+  configurationGuide?: ConfigurationGuide;
 }
 
 export interface Module {
@@ -35,6 +42,11 @@ export interface Module {
   files: string[];
   publicAPI: string[];
   dependencies: string[];
+  // Extended fields
+  architectureRole?: string;
+  businessContext?: string;
+  gotchas?: string[];
+  aiSummary?: string;
 }
 
 export interface FileInfo {
@@ -42,8 +54,15 @@ export interface FileInfo {
   language: string;
   purpose: string;
   role: string;
-  exports: string[];
+  exports: string[] | ExportInfo[];
   complexity: 'low' | 'medium' | 'high';
+  architectureSignificance?: 'critical' | 'important' | 'supporting';
+}
+
+export interface ExportInfo {
+  name: string;
+  type: string;
+  description: string;
 }
 
 export interface Symbol {
@@ -71,10 +90,103 @@ export interface ExternalPackage {
   usedIn: string[];
 }
 
+export interface InternalDependency {
+  source: string;
+  target: string;
+  relationship?: string;
+  coupling?: string;
+  reason?: string;
+}
+
+export interface ExternalDependency {
+  package: string;
+  version?: string;
+  purpose?: string;
+  usedIn?: string[];
+  importantAPIs?: string[];
+  alternatives?: string;
+  notes?: string;
+}
+
 export interface Pattern {
   name: string;
   description: string;
   files: string[];
+  rules?: string[];
+  examples?: {
+    correct?: string;
+    incorrect?: string;
+  };
+}
+
+export interface ApiInfo {
+  overview?: string;
+  baseUrl?: string;
+  authentication?: string;
+  endpoints?: ApiEndpoint[];
+}
+
+export interface ApiEndpoint {
+  method: string;
+  path: string;
+  handler?: string;
+  file?: string;
+  purpose?: string;
+}
+
+export interface AIGuidance {
+  mustFollow?: string[];
+  mustAvoid?: string[];
+  commonTasks?: Record<string, CommonTask>;
+  projectSpecificKnowledge?: string[];
+}
+
+export interface CommonTask {
+  approach: string;
+  files?: string[];
+  example?: string;
+}
+
+export interface SemanticSearch {
+  byFeature?: Record<string, FeatureInfo>;
+  byTask?: Record<string, TaskGuide>;
+  byConcept?: Record<string, string[]>;
+}
+
+export interface FeatureInfo {
+  description?: string;
+  files?: string[];
+  entryPoints?: string[];
+  modifyingThisFeature?: string;
+}
+
+export interface TaskGuide {
+  files?: string[];
+  steps?: string[];
+  template?: string;
+  warnings?: string[];
+}
+
+export interface ConfigurationGuide {
+  envVariables?: EnvVariable[];
+  configFiles?: ConfigFile[];
+  secrets?: string;
+}
+
+export interface EnvVariable {
+  name: string;
+  purpose?: string;
+  required?: boolean;
+  default?: string;
+  example?: string;
+  sensitive?: boolean;
+}
+
+export interface ConfigFile {
+  file: string;
+  purpose?: string;
+  format?: string;
+  keySettings?: string[];
 }
 
 /**

@@ -31,14 +31,27 @@ export class ApiClient {
     const endpoint = this.getApiEndpoint();
     const url = `${endpoint}${path}`;
 
-    const response = await fetch(url, {
-      method: options.method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${options.idToken}`,
-      },
-      body: options.body ? JSON.stringify(options.body) : undefined,
-    });
+    console.log(`[DocuDepth API] ${options.method} ${path}`);
+    if (options.body) {
+      const bodyStr = JSON.stringify(options.body);
+      console.log(`[DocuDepth API] Body size: ${(bodyStr.length / 1024).toFixed(2)} KB`);
+    }
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: options.method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${options.idToken}`,
+        },
+        body: options.body ? JSON.stringify(options.body) : undefined,
+      });
+    } catch (fetchError: any) {
+      console.error(`[DocuDepth API] Fetch error:`, fetchError.message || fetchError);
+      console.error(`[DocuDepth API] URL: ${url}`);
+      throw new Error(`Network error: ${fetchError.message || 'fetch failed'}`);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -115,10 +128,26 @@ export class ApiClient {
    * Get completed context map
    */
   async getResult(idToken: string, contextMapId: string): Promise<ResultResponse> {
-    return this.request<ResultResponse>(`/api/context-map/${contextMapId}`, {
+    const result = await this.request<ResultResponse>(`/api/context-map/${contextMapId}`, {
       method: 'GET',
       idToken,
     });
+
+    console.log(`[DocuDepth API] getResult response keys:`, Object.keys(result));
+    console.log(`[DocuDepth API] context_map type:`, typeof result.context_map);
+    console.log(`[DocuDepth API] context_map is null/undefined:`, result.context_map == null);
+
+    // Validate context_map exists before returning
+    if (!result.context_map) {
+      const errorMsg =
+        (result as any).error ||
+        (result as any).error_message ||
+        `Context map data not available (status: ${result.status})`;
+      throw new Error(errorMsg);
+    }
+
+    console.log(`[DocuDepth API] context_map keys:`, Object.keys(result.context_map));
+    return result;
   }
 
   /**

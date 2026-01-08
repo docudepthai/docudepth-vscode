@@ -5,10 +5,13 @@ import { FileChange } from '../types';
 import { EXTENSION_CONSTANTS } from '../config/constants';
 
 /**
- * File watcher that tracks changes and batches them for updates
+ * File watcher that tracks changes and syncs on file SAVE (not every keystroke)
+ * This dramatically reduces API calls during active coding sessions
  */
 export class FileWatcher {
-  private watcher: vscode.FileSystemWatcher | null = null;
+  private saveListener: vscode.Disposable | null = null;
+  private deleteWatcher: vscode.FileSystemWatcher | null = null;
+  private createWatcher: vscode.FileSystemWatcher | null = null;
   private pendingChanges: Map<string, FileChange> = new Map();
   private debounceTimer: NodeJS.Timeout | null = null;
   private onChangesCallback: ((changes: FileChange[]) => void) | null = null;
@@ -19,31 +22,44 @@ export class FileWatcher {
   }
 
   /**
-   * Start watching for file changes
+   * Start watching for file saves (not every change)
    */
   start(onChanges: (changes: FileChange[]) => void): void {
     this.onChangesCallback = onChanges;
 
-    // Watch all files except node_modules, .git, and .docudepth
+    // Watch for file SAVES (user presses Cmd+S / Ctrl+S)
+    this.saveListener = vscode.workspace.onDidSaveTextDocument((document) => {
+      this.handleSave(document);
+    });
+
+    // Still watch for file creates and deletes via file system watcher
     const pattern = new vscode.RelativePattern(
       this.workspaceRoot,
       '**/*.{ts,tsx,js,jsx,py,java,go,rs,c,cpp,h,hpp,cs,rb,php,swift,kt,scala,md,json,yaml,yml,toml,xml,html,css,scss,sass,less,vue,svelte,dart}'
     );
 
-    this.watcher = vscode.workspace.createFileSystemWatcher(pattern);
+    this.createWatcher = vscode.workspace.createFileSystemWatcher(pattern);
+    this.deleteWatcher = vscode.workspace.createFileSystemWatcher(pattern);
 
-    this.watcher.onDidCreate((uri) => this.handleChange(uri, 'added'));
-    this.watcher.onDidChange((uri) => this.handleChange(uri, 'modified'));
-    this.watcher.onDidDelete((uri) => this.handleChange(uri, 'deleted'));
+    this.createWatcher.onDidCreate((uri) => this.handleFileSystemChange(uri, 'added'));
+    this.deleteWatcher.onDidDelete((uri) => this.handleFileSystemChange(uri, 'deleted'));
   }
 
   /**
    * Stop watching for file changes
    */
   stop(): void {
-    if (this.watcher) {
-      this.watcher.dispose();
-      this.watcher = null;
+    if (this.saveListener) {
+      this.saveListener.dispose();
+      this.saveListener = null;
+    }
+    if (this.createWatcher) {
+      this.createWatcher.dispose();
+      this.createWatcher = null;
+    }
+    if (this.deleteWatcher) {
+      this.deleteWatcher.dispose();
+      this.deleteWatcher = null;
     }
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -53,9 +69,44 @@ export class FileWatcher {
   }
 
   /**
-   * Handle a file change event
+   * Handle file save event (user pressed Cmd+S / Ctrl+S)
    */
-  private handleChange(uri: vscode.Uri, changeType: 'added' | 'modified' | 'deleted'): void {
+  private handleSave(document: vscode.TextDocument): void {
+    // Only handle files in our workspace
+    if (!document.uri.fsPath.startsWith(this.workspaceRoot)) {
+      return;
+    }
+
+    const relativePath = path.relative(this.workspaceRoot, document.uri.fsPath);
+
+    // Skip files we don't want to track
+    if (this.shouldIgnore(relativePath)) {
+      return;
+    }
+
+    // Skip very large files (>100KB)
+    const content = document.getText();
+    if (content.length > 100 * 1024) {
+      return;
+    }
+
+    console.log(`[DocuDepth] File saved: ${relativePath}`);
+
+    // Add to pending changes
+    this.pendingChanges.set(relativePath, {
+      path: relativePath,
+      changeType: 'modified',
+      content,
+    });
+
+    // Debounce to batch rapid saves (e.g., save all)
+    this.scheduleCallback();
+  }
+
+  /**
+   * Handle file system create/delete events
+   */
+  private handleFileSystemChange(uri: vscode.Uri, changeType: 'added' | 'deleted'): void {
     const relativePath = path.relative(this.workspaceRoot, uri.fsPath);
 
     // Skip files we don't want to track
@@ -63,9 +114,9 @@ export class FileWatcher {
       return;
     }
 
-    // Read file content for added/modified files
+    // Read file content for added files
     let content: string | undefined;
-    if (changeType !== 'deleted') {
+    if (changeType === 'added') {
       try {
         content = fs.readFileSync(uri.fsPath, 'utf-8');
         // Skip very large files (>100KB)
@@ -78,7 +129,9 @@ export class FileWatcher {
       }
     }
 
-    // Add to pending changes (overwrites previous change for same file)
+    console.log(`[DocuDepth] File ${changeType}: ${relativePath}`);
+
+    // Add to pending changes
     this.pendingChanges.set(relativePath, {
       path: relativePath,
       changeType,
@@ -91,6 +144,7 @@ export class FileWatcher {
 
   /**
    * Schedule the callback with debouncing
+   * Short debounce (3s) since we're only triggering on saves now
    */
   private scheduleCallback(): void {
     if (this.debounceTimer) {
@@ -98,6 +152,7 @@ export class FileWatcher {
     }
 
     const config = vscode.workspace.getConfiguration('docudepth');
+    // Use shorter debounce since we're on save, not every keystroke
     const debounceMs = config.get<number>('autoSyncDebounce') || 3000;
 
     this.debounceTimer = setTimeout(() => {

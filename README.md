@@ -62,8 +62,9 @@ AI suggestions are now dramatically more accurate
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `docudepth.autoSync` | `true` | Automatically sync file changes |
-| `docudepth.autoSyncDebounce` | `3000` | Debounce time (ms) before syncing |
+| `docudepth.autoSync` | `true` | Automatically sync on file save (Cmd+S) |
+| `docudepth.autoSyncDebounce` | `3000` | Debounce after save (batches "Save All") |
+| `docudepth.syncOnFocusLoss` | `true` | Sync when VS Code loses focus |
 | `docudepth.maxFilesPerBatch` | `50` | Max files per sync batch |
 
 ## Requirements

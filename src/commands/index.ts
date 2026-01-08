@@ -371,6 +371,17 @@ export class CommandHandlers {
   }
 
   /**
+   * Sync any pending file changes immediately
+   * Called when window loses focus or on manual trigger
+   */
+  syncPendingChanges(): void {
+    if (this.fileWatcher && this.fileWatcher.hasPendingChanges()) {
+      console.log('[DocuDepth] Flushing pending changes due to focus loss');
+      this.fileWatcher.flushChanges();
+    }
+  }
+
+  /**
    * Poll for generation completion
    */
   private async pollForCompletion(
@@ -407,6 +418,17 @@ export class CommandHandlers {
     workspaceRoot: string,
     contextMap: ContextMap
   ): Promise<void> {
+    // Validate contextMap before any file operations
+    if (!contextMap) {
+      throw new Error('Cannot save context map: data is undefined');
+    }
+
+    if (!contextMap.repository || !contextMap.architecture) {
+      throw new Error(
+        'Cannot save context map: missing required fields (repository, architecture)'
+      );
+    }
+
     const docudepthDir = path.join(workspaceRoot, EXTENSION_CONSTANTS.docudepthDir);
 
     // Create directory if it doesn't exist
@@ -418,12 +440,12 @@ export class CommandHandlers {
     const contextMapPath = path.join(docudepthDir, EXTENSION_CONSTANTS.contextMapFile);
     fs.writeFileSync(contextMapPath, JSON.stringify(contextMap, null, 2));
 
-    // Save metadata
+    // Save metadata (now safe since we validated contextMap exists)
     const metadataPath = path.join(docudepthDir, EXTENSION_CONSTANTS.metadataFile);
     const metadata = {
       contextMapId: this.currentContextMapId,
       lastUpdated: new Date().toISOString(),
-      version: contextMap.version,
+      version: contextMap.version || '2.0.0',
     };
     fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
 

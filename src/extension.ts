@@ -107,6 +107,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     outputChannel.appendLine('Commands registered successfully');
 
+    // Register window focus change handler for sync on focus loss
+    const focusChangeHandler = vscode.window.onDidChangeWindowState((state) => {
+      if (!state.focused) {
+        // Window lost focus - sync pending changes if enabled
+        const config = vscode.workspace.getConfiguration('docudepth');
+        if (config.get<boolean>('syncOnFocusLoss') && commandHandlers) {
+          outputChannel?.appendLine('Window lost focus - syncing pending changes');
+          commandHandlers.syncPendingChanges();
+        }
+      }
+    });
+    context.subscriptions.push(focusChangeHandler);
+
     // Check authentication status on startup
     try {
       const isAuthenticated = await tokenManager.isAuthenticated();
